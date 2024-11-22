@@ -1,7 +1,9 @@
+import random
 from flask import Flask, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
 from models import *
 from dotenv import load_dotenv
+from utils import *
 import os
 from extensions import *
 
@@ -101,7 +103,7 @@ def login():
 
     # Check if the user exists
     user = User.query.filter_by(email=email).first()
-
+    
     if user is None:
         return (
             jsonify({"message": "User not found for the given identifier: " + email}),
@@ -121,6 +123,11 @@ def login():
 @jwt_required()
 def user_info():
     try:
+        # Check if token has been revoked
+        jti = get_jwt()["jti"]
+
+        if is_token_revoked(jti):
+            return jsonify({"message": "Session has expired"}), 401
         
         user_id = get_jwt_identity()
 
@@ -152,6 +159,12 @@ def user_info():
 @jwt_required()
 def account_info():
     try:
+        # Check if token has been revoked
+        jti = get_jwt()["jti"]
+        
+        if is_token_revoked(jti):
+            return jsonify({"message": "Session has expired"}), 401
+
         user_id = get_jwt_identity()
 
         user = User.query.get(user_id)
@@ -159,18 +172,92 @@ def account_info():
         if not user:
             return jsonify({"message": "Access Denied"}), 401
 
-        return(
+        return (
             jsonify(
                 {
                     "accountNumber": user.accountNumber,
                     "balance": user.account.balance,
                 }
             ),
-            200
-        ) 
+            200,
+        )
     except Exception as e:
         print("Error:", e)
         return jsonify({"message": "Internal Server Error"}), 500
+
+@app.route("/api/users/logout", methods=['POST'])
+@jwt_required()
+def logout():
+    jti=get_jwt()['jti']
+    revoked_token = RevokedToken(token=jti)
+    db.session.add(revoked_token)
+    db.session.commit()
+    return (jsonify({"message": "Successfully logged out"})), 200
+
+@app.route("/api/auth/password-reset/send-otp", methods=['POST'])
+def send_otp():
+    data = request.get_json()
+    identifier = data.get("identifier")
+
+    user = User.query.filter_by(email=identifier).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 400
+
+    otp = random.randint(100000, 999999)
+
+    otp_entry = OTP(identifier=identifier, otp=str(otp))
+
+    db.session.add(otp_entry)
+    db.session.commit()
+
+    send_email(identifier, otp)
+
+    return (jsonify({"message": "OTP sent successfully to: " + identifier})), 200
+
+@app.route("/api/auth/password-reset/verify-otp", methods=['POST'])
+def verify_otp():
+    data = request.get_json()
+    identifier = data.get("identifier")
+    otp = data.get("otp")
+
+    otp_code = OTP.query.filter_by(identifier=identifier, otp=otp).first()
+    user = User.query.filter_by(email=identifier).first()
+
+    if not otp_code:
+        return jsonify({"error": "Invalid OTP."}), 400
+
+    otp_code.current_datetime = datetime.now(timezone.utc)
+
+    if not otp_code.is_valid():
+        return jsonify({"error": "Invalid OTP."}), 400
+
+    password_reset_token = str(uuid.uuid4())
+    user.reset_token = password_reset_token
+    db.session.commit()
+
+    return jsonify({"passwordResetToken": password_reset_token}), 200
+
+
+@app.route("/auth/password-reset", methods=["POST"])
+def reset_password():
+    data = request.get_json()
+    identifier = data.get("identifier")
+    reset_token = data.get("resetToken")
+    new_password = data.get("newPassword")
+
+    user = User.query.filter_by(email=identifier).first()
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+
+    if user.reset_token != reset_token:
+        return jsonify({"error": "Invalid reset token."}), 400
+
+    user.set_password(new_password)
+
+    user.reset_token = None
+    db.session.commit()
+
+    return jsonify({"message": "Password reset successfully"}), 200
 
 
 if __name__ == "__main__":
