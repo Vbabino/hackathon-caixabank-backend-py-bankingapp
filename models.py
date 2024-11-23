@@ -14,6 +14,7 @@ class User(db.Model):
     )
     password_hash = db.Column(db.String(128), nullable=False)
     reset_token = db.Column(db.String(36), nullable=True)
+    pin = db.Column(db.String(4), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     account = db.relationship("Account", back_populates="user", uselist=False)
