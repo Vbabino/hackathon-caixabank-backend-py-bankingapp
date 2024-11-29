@@ -19,6 +19,11 @@ class User(db.Model):
 
     account = db.relationship("Account", back_populates="user", uselist=False)
 
+    transactions = db.relationship(
+        "Transaction",
+        back_populates="user",
+    )
+
     # Hash the password
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
@@ -61,3 +66,15 @@ class OTP(db.Model):
             expires_at = self.expires_at.replace(tzinfo=timezone.utc)  # Convert to UTC
             return current_dt < expires_at
         return False
+
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    transaction_type = db.Column(db.String(20), nullable=False)
+    transaction_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    source_account_number = db.Column(db.String(36), nullable=False)
+    target_account_number = db.Column(db.String(36), nullable=True)
+
+    user = db.relationship("User", back_populates="transactions")

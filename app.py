@@ -8,6 +8,7 @@ from routes.auth_routes import auth_bp
 from routes.user_info_routes import user_bp
 from routes.password_reset_routes import otp_bp
 from routes.pin_routes import pin_bp
+from routes.transactions_routes import transactions_bp
 
 load_dotenv()
 
@@ -32,6 +33,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(otp_bp)
 app.register_blueprint(pin_bp)
+app.register_blueprint(transactions_bp)
 
 
 # Placeholder route for testing

@@ -66,7 +66,7 @@ def register():
         )
     except Exception as e:
         print("Error:", e)  # Debug line for errors
-        return jsonify({"message": "Internal Server Error"}), 500
+        return jsonify({"message": "An error occurred", "error": str(e)}), 500
 
 
 # Endpoint for user login
