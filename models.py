@@ -24,6 +24,11 @@ class User(db.Model):
         back_populates="user",
     )
 
+    assets = db.relationship(
+        "Asset",
+        back_populates="user",
+    )
+
     # Hash the password
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
@@ -78,3 +83,13 @@ class Transaction(db.Model):
     target_account_number = db.Column(db.String(36), nullable=True)
 
     user = db.relationship("User", back_populates="transactions")
+
+class Asset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    asset_symbol = db.Column(db.String(10), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    purchase_price = db.Column(db.Float, nullable=False)
+    quantity = db.Column(db.Float, default=0.0)
+
+    user = db.relationship("User", back_populates="assets")

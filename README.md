@@ -332,7 +332,7 @@ For both buying and selling, the values obtained in real time using the API prov
 
 For both buying and selling, it is necessary to carry out the necessary operations so that the assets obtained with the amount invested are kept in the account.
 
-- **Buy Assets**: Implement functionality to allow users to buy assets (e.g., stocks) by specifying the asset symbol, the amount to invest, and the user's PIN.
+- **Buy Assets**: Implement functionality to allow users to buy assets (e.g., sto cks) by specifying the asset symbol, the amount to invest, and the user's PIN.
     Request body:
     ```json
     {

@@ -68,6 +68,7 @@ def deposit():
             amount=amount,
             transaction_type="CASH_DEPOSIT",
             source_account_number=user.accountNumber,
+            target_account_number="N/A",
         )
         db.session.add(new_transaction)
 
@@ -142,6 +143,7 @@ def withdraw():
             amount=amount,
             transaction_type="CASH_WITHDRAWAL",
             source_account_number=user.accountNumber,
+            target_account_number="N/A",
         )
         db.session.add(new_transaction)
 
