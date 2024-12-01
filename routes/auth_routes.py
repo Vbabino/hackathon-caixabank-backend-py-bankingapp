@@ -1,7 +1,9 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from extensions import *
-from utils import *
+from models import Account, RevokedToken, User
+from utils import validate_email, validate_password
+
 
 # Create a blueprint
 auth_bp = Blueprint("auth", __name__)
@@ -27,7 +29,11 @@ def register():
                 jsonify({"message": f"Missing fields: {', '.join(missing_fields)}"}),
                 400,
             )
-
+        
+        # Validate email
+        if not validate_email(email):
+            return jsonify({"message": "Invalid email"}), 400
+        
         # Check if email already exists
         if User.query.filter_by(email=email).first():
             return jsonify({"message": "Email already registered."}), 400
@@ -35,6 +41,16 @@ def register():
         # Check if phone number already exists
         if User.query.filter_by(phoneNumber=phoneNumber).first():
             return jsonify({"message": "Phone number already registered."}), 400
+
+        # Check if password is valid
+        if not validate_password(password):
+            return jsonify(
+                {
+                    "message": "Password must be between 8 and 128 characters long, "
+                    "contain at least one uppercase letter, one digit, one special character, "
+                    "and must not contain any spaces."
+                }
+            ), 400
 
         # Create a new user
         new_user = User(

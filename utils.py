@@ -1,5 +1,6 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import re
 from models import *
 from sqlalchemy import exists
 import smtplib
@@ -9,6 +10,24 @@ import requests
 def is_token_revoked(jti):
     token_revoked = db.session.query(exists().where(RevokedToken.token == jti)).scalar()
     return token_revoked
+
+
+def validate_email(email):
+    pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+    return bool(re.match(pattern, email))
+
+def validate_password(password):
+    if len(password) < 8 or len(password) > 128:
+        return False
+    if not any(char.isupper() for char in password):
+        return False
+    if not any(char.isdigit() for char in password):
+        return False
+    if not any(char in "!@#$%^&*()-_=+[{]}\|;:'\",<.>/?`~" for char in password):
+        return False
+    if any(char.isspace() for char in password):
+        return False
+    return True
 
 
 def send_email(to_email, otp):
