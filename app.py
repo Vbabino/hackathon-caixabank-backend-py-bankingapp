@@ -10,6 +10,7 @@ from routes.password_reset_routes import otp_bp
 from routes.pin_routes import pin_bp
 from routes.transactions_routes import transactions_bp
 from routes.market_operations_routes import market_operations_bp
+from routes.subscription_routes import subscription_routes_bp
 
 load_dotenv()
 
@@ -36,6 +37,7 @@ app.register_blueprint(otp_bp)
 app.register_blueprint(pin_bp)
 app.register_blueprint(transactions_bp)
 app.register_blueprint(market_operations_bp)
+app.register_blueprint(subscription_routes_bp)
 
 
 # Placeholder route for testing

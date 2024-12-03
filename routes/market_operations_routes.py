@@ -3,7 +3,12 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from sqlalchemy import func
 from extensions import db
 from models import Asset, Transaction, User
-from utils import is_token_revoked, get_market_price, send_investment_confirmation_email, send_investment_sale_confirmation_email
+from utils import (
+    is_token_revoked,
+    get_market_price,
+    send_investment_confirmation_email,
+    send_investment_sale_confirmation_email,
+)
 
 market_operations_bp = Blueprint("market_operations", __name__)
 
@@ -84,8 +89,9 @@ def buy_asset():
             amount=amount,
             transaction_type="ASSET_PURCHASE",
             source_account_number=user.accountNumber,
+            target_account_number="N/A",
         )
-        
+
         db.session.add(new_transaction)
         db.session.add(new_asset_purchase)
         db.session.commit()
@@ -142,7 +148,10 @@ def sell_asset():
         missing_fields = [field for field in required_fields if not data.get(field)]
 
         if missing_fields:
-            return jsonify({"message": f"Missing fields: {', '.join(missing_fields)}"}), 400
+            return (
+                jsonify({"message": f"Missing fields: {', '.join(missing_fields)}"}),
+                400,
+            )
 
         pin = data.get("pin")
         asset_symbol = data.get("assetSymbol")
@@ -157,7 +166,9 @@ def sell_asset():
             return jsonify({"message": "Invalid quantity."}), 400
 
         # Check if user has the asset
-        asset = Asset.query.filter_by(user_id=user.id, asset_symbol=asset_symbol).first()
+        asset = Asset.query.filter_by(
+            user_id=user.id, asset_symbol=asset_symbol
+        ).first()
 
         if asset is None:
             return jsonify({"message": "Asset not found"}), 404
@@ -193,7 +204,11 @@ def sell_asset():
         db.session.commit()
 
         # Query the total quantity of the given asset symbol
-        current_holdings = db.session.query(func.sum(Asset.quantity)).filter_by(user_id=user.id, asset_symbol=asset_symbol).scalar()
+        current_holdings = (
+            db.session.query(func.sum(Asset.quantity))
+            .filter_by(user_id=user.id, asset_symbol=asset_symbol)
+            .scalar()
+        )
 
         total_gain_loss = total_sale_value - (quantity * asset.purchase_price)
 
@@ -205,13 +220,14 @@ def sell_asset():
             gain_loss=total_gain_loss,
             current_holdings=current_holdings,
             purchase_price=asset.purchase_price,
-            balance=user.account.balance
+            balance=user.account.balance,
         )
 
         return jsonify({"message": "Asset sold successfully"}), 200
 
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
+
 
 @market_operations_bp.route("/market/prices", methods=["GET"])
 def market_prices():
@@ -221,6 +237,7 @@ def market_prices():
 
     except Exception as e:
         return jsonify({"message": "An error occurred", "error": str(e)}), 500
+
 
 @market_operations_bp.route("/market/prices/<symbol>", methods=["GET"])
 def market_price(symbol):

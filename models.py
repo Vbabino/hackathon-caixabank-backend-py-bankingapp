@@ -16,6 +16,7 @@ class User(db.Model):
     reset_token = db.Column(db.String(36), nullable=True)
     pin = db.Column(db.String(4), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    auto_invest_enabled = db.Column(db.Boolean, default=False)
 
     account = db.relationship("Account", back_populates="user", uselist=False)
 
@@ -26,6 +27,16 @@ class User(db.Model):
 
     assets = db.relationship(
         "Asset",
+        back_populates="user",
+    )
+
+    subscriptions = db.relationship(
+        "Subscription",
+        back_populates="user",
+    )
+
+    profits = db.relationship(
+        "Profit",
         back_populates="user",
     )
 
@@ -83,6 +94,7 @@ class Transaction(db.Model):
     target_account_number = db.Column(db.String(36), nullable=True)
 
     user = db.relationship("User", back_populates="transactions")
+    profits = db.relationship("Profit", back_populates="transaction")
 
 class Asset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,3 +105,27 @@ class Asset(db.Model):
     quantity = db.Column(db.Float, default=0.0)
 
     user = db.relationship("User", back_populates="assets")
+
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    interval_seconds = db.Column(db.Integer, nullable=False)
+    next_payment_date = db.Column(db.DateTime)
+    job_id = db.Column(
+        db.String(36), nullable=False, unique=True, default=lambda: str(uuid.uuid4())
+    )
+
+    user = db.relationship("User", back_populates="subscriptions")
+
+
+class Profit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    transaction_id = db.Column(
+        db.Integer, db.ForeignKey("transaction.id"), nullable=False
+    )
+    profitability = db.Column(db.Float, nullable=False)
+
+    user = db.relationship("User", back_populates="profits")
+    transaction = db.relationship("Transaction", back_populates="profits")
