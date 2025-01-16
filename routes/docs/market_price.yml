@@ -1,0 +1,19 @@
+tags:
+  - Market Data
+summary: Get Market Price
+description: Endpoint to retrieve the current price of a specific asset by its symbol.
+parameters:
+  - in: path
+    name: symbol
+    required: true
+    schema:
+      type: string
+    description: The symbol of the asset for which the price is being requested.
+    example: "AAPL"
+responses:
+  200:
+    description: Successfully retrieved the asset's market price.
+  404:
+    description: Asset not found.
+  500:
+    description: Internal Server Error.

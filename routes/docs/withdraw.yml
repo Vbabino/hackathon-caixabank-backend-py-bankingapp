@@ -1,0 +1,40 @@
+tags:
+  - Transactions
+summary: Withdraw cash
+description: Endpoint to withdraw cash from the authenticated user's account.
+parameters:
+  - in: header
+    name: Authorization
+    required: true
+    schema:
+      type: string
+    description: JWT token in the format "Bearer <your_token>"
+    example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - pin
+        - amount
+      properties:
+        pin:
+          type: string
+          description: The user's 4-digit PIN.
+          example: "1234"
+        amount:
+          type: number
+          description: The amount to withdraw. Must be greater than 0 and not exceed the available balance.
+          example: 100
+security:
+  - BearerAuth: []
+responses:
+  200:
+    description: Cash withdrawn successfully.
+  400:
+    description: Missing fields, invalid input data, or insufficient funds.
+  401:
+    description: Invalid PIN or session has expired.
+  500:
+    description: Internal Server Error.

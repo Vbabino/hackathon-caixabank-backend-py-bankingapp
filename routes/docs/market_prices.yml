@@ -1,0 +1,9 @@
+tags:
+  - Market Data
+summary: Get Market Prices
+description: Endpoint to retrieve the current market prices for all available assets.
+responses:
+  200:
+    description: Successfully retrieved market prices.
+  500:
+    description: Internal Server Error.

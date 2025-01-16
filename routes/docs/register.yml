@@ -1,0 +1,35 @@
+tags:
+  - Authentication
+summary: User registration
+description: Endpoint to register a new user.
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - name
+        - email
+        - password
+        - address
+        - phoneNumber
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+          description: Password must contain at least one uppercase letter, at least one digit and one special character, cannot contain whitespace, and be at least 8 characters long and less than 128 characters long.
+        address:
+          type: string
+        phoneNumber:
+          type: string
+responses:
+  201:
+    description: User successfully registered.
+  400:
+    description: Invalid input data.
+  500:
+    description: Internal server error.

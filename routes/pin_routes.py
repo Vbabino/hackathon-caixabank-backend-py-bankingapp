@@ -4,6 +4,7 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from extensions import *
 from models import User
 from utils import is_token_revoked
+from flasgger.utils import swag_from
 
 
 pin_bp = Blueprint("pin", __name__)
@@ -11,6 +12,7 @@ pin_bp = Blueprint("pin", __name__)
 
 @pin_bp.route("/api/account/pin/create", methods=["POST"])
 @jwt_required()
+@swag_from("docs/create_pin.yml")
 def create_pin():
 
     try:
@@ -52,6 +54,7 @@ def create_pin():
 
 @pin_bp.route("/api/account/pin/update", methods=["POST"])
 @jwt_required()
+@swag_from("docs/update_pin.yml")
 def update_pin():
 
     try:

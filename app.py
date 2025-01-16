@@ -1,5 +1,7 @@
 from flask import Flask
 from dotenv import load_dotenv
+from flasgger import Swagger
+from flasgger.utils import swag_from
 
 import os
 from extensions import *
@@ -19,6 +21,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+swagger = Swagger(app, template_file="swagger_template.yml")
 
 # Initialize extensions
 db.init_app(app)

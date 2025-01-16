@@ -1,0 +1,46 @@
+tags:
+  - Pin
+summary: Update PIN
+description: Endpoint to update the 4-digit PIN for the authenticated user.
+parameters:
+  - in: header
+    name: Authorization
+    required: true
+    schema:
+      type: string
+    description: JWT token in the format "Bearer <your_token>"
+    example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - oldPin
+        - password
+        - newPin
+      properties:
+        oldPin:
+          type: string
+          description: The current 4-digit PIN of the user.
+          example: "1234"
+        password:
+          type: string
+          description: The user's account password for verification.
+          example: "password123"
+        newPin:
+          type: string
+          description: The new 4-digit PIN to set for the user.
+          example: "5678"
+security:
+  - BearerAuth: []
+responses:
+  201:
+    description: PIN updated successfully
+  400:
+    description: Missing fields, invalid PIN format, or incorrect user details
+  401:
+    description: Session expired, incorrect old PIN, or bad credentials
+  500:
+    description: Internal Server Error
+    

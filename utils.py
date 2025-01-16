@@ -37,6 +37,16 @@ def validate_password(password):
 
 
 def send_email(to_email, otp):
+    """
+    Sends an email containing an OTP code to the specified email address.
+
+    Args:
+        to_email (str): The recipient's email address.
+        otp (str): The one-time password to be sent in the email.
+
+    Returns:
+        None
+    """
     from_email = "CaixaBank@caixabank.com"
     subject = "Your OTP Code"
     body = f"OTP: {otp}"

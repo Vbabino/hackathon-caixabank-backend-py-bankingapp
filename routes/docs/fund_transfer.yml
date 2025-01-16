@@ -1,0 +1,47 @@
+tags:
+  - Transactions
+summary: Fund Transfer
+description: Endpoint to transfer funds from the authenticated user's account to another account.
+parameters:
+  - in: header
+    name: Authorization
+    required: true
+    schema:
+      type: string
+    description: JWT token in the format "Bearer <your_token>"
+    example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - pin
+        - amount
+        - targetAccountNumber
+      properties:
+        pin:
+          type: string
+          description: The user's 4-digit PIN.
+          example: "1234"
+        amount:
+          type: number
+          description: The amount to transfer. Must be greater than 0 and not exceed the user's account balance.
+          example: 200
+        targetAccountNumber:
+          type: string
+          description: The account number of the recipient.
+          example: "987654321"
+security:
+  - BearerAuth: []
+responses:
+  200:
+    description: Fund transferred successfully.
+  400:
+    description: Missing fields, invalid input data, or insufficient funds.
+  401:
+    description: Invalid PIN, session expired, or incorrect user details.
+  404:
+    description: Target account does not exist.
+  500:
+    description: Internal Server Error.

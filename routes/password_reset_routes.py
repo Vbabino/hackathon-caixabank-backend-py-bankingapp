@@ -6,11 +6,13 @@ from extensions import *
 
 from models import OTP, User
 from utils import send_email
+from flasgger.utils import swag_from
 
 otp_bp = Blueprint("otp", __name__)
 
 
 @otp_bp.route("/api/auth/password-reset/send-otp", methods=["POST"])
+@swag_from("docs/send_otp.yml")
 def send_otp():
     data = request.get_json()
     identifier = data.get("identifier")
@@ -32,6 +34,7 @@ def send_otp():
 
 
 @otp_bp.route("/api/auth/password-reset/verify-otp", methods=["POST"])
+@swag_from("docs/verify_otp.yml")
 def verify_otp():
     data = request.get_json()
     identifier = data.get("identifier")
@@ -56,6 +59,7 @@ def verify_otp():
 
 
 @otp_bp.route("/auth/password-reset", methods=["POST"])
+@swag_from("docs/reset_password.yml")
 def reset_password():
     data = request.get_json()
     identifier = data.get("identifier")

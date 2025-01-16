@@ -1,0 +1,22 @@
+tags:
+  - Authentication
+summary: Send OTP for password reset
+description: Endpoint to send a One-Time Password (OTP) to the user's email for password reset purposes.
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - identifier
+      properties:
+        identifier:
+          type: string
+          description: The email address of the user to send the OTP to.
+          example: "testuser@example.com"
+responses:
+  200:
+    description: OTP sent successfully to the specified email.
+  400:
+    description: User not found or invalid request data.

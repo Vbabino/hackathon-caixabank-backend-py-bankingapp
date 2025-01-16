@@ -1,0 +1,29 @@
+tags:
+  - Authentication
+summary: Verify OTP
+description: Endpoint to verify the OTP sent to the user's email and generate a password reset token if valid.
+parameters:
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - identifier
+        - otp
+      properties:
+        identifier:
+          type: string
+          description: The email address of the user.
+          example: "user@example.com"
+        otp:
+          type: string
+          description: The OTP sent to the user's email.
+          example: "123456"
+responses:
+  200:
+    description: OTP verified successfully, password reset token generated.
+  400:
+    description: Invalid OTP or OTP expired.
+  500:
+    description: Internal Server Error.

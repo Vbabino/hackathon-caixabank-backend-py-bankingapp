@@ -4,12 +4,14 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
 from flask import Blueprint, request, jsonify
 from extensions import db
 from flask import current_app
+from flasgger.utils import swag_from
 
 subscription_routes_bp = Blueprint("subscription_routes", __name__)
 
 
 @subscription_routes_bp.route("/api/user-actions/subscribe", methods=["POST"])
 @jwt_required()
+@swag_from("docs/create_subscription.yml")
 def create_subscription():
     try:
         # Check if token has been revoked
@@ -89,6 +91,7 @@ def create_subscription():
 
 @subscription_routes_bp.route("/api/account/enable-auto-invest", methods=["POST"])
 @jwt_required()
+@swag_from("docs/enable_auto_invest.yml")
 def enable_auto_invest():
     try:
         user_id = get_jwt_identity()
@@ -121,6 +124,7 @@ def enable_auto_invest():
 
 @subscription_routes_bp.route("/api/account/disbale-auto-invest", methods=["POST"])
 @jwt_required()
+@swag_from("docs/disable_auto_invest.yml")
 def disable_auto_invest():
 
     try:
@@ -146,13 +150,9 @@ def disable_auto_invest():
         user.auto_invest_enabled = False
         db.session.commit()
         return (
-            jsonify(
-                {
-                    "message": "Automatic investment disabled successfully."
-                }
-            ),
+            jsonify({"message": "Automatic investment disabled successfully."}),
             200,
-            )
+        )
 
     except Exception as e:
         return jsonify({"message": str(e)}), 500

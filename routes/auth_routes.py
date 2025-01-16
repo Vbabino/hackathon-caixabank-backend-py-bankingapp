@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt
 from extensions import *
 from models import Account, RevokedToken, User
 from utils import validate_email, validate_password
+from flasgger.utils import swag_from
 
 
 # Create a blueprint
@@ -11,7 +12,9 @@ auth_bp = Blueprint("auth", __name__)
 
 # Endpoint to register a new user
 @auth_bp.route("/api/users/register", methods=["POST"])
+@swag_from("docs/register.yml")
 def register():
+
     try:
         data = request.get_json()
         name = data.get("name")
@@ -29,11 +32,11 @@ def register():
                 jsonify({"message": f"Missing fields: {', '.join(missing_fields)}"}),
                 400,
             )
-        
+
         # Validate email
         if not validate_email(email):
             return jsonify({"message": "Invalid email"}), 400
-        
+
         # Check if email already exists
         if User.query.filter_by(email=email).first():
             return jsonify({"message": "Email already registered."}), 400
@@ -44,13 +47,16 @@ def register():
 
         # Check if password is valid
         if not validate_password(password):
-            return jsonify(
-                {
-                    "message": "Password must be between 8 and 128 characters long, "
-                    "contain at least one uppercase letter, one digit, one special character, "
-                    "and must not contain any spaces."
-                }
-            ), 400
+            return (
+                jsonify(
+                    {
+                        "message": "Password must be between 8 and 128 characters long, "
+                        "contain at least one uppercase letter, one digit, one special character, "
+                        "and must not contain any spaces."
+                    }
+                ),
+                400,
+            )
 
         # Create a new user
         new_user = User(
@@ -87,6 +93,7 @@ def register():
 
 # Endpoint for user login
 @auth_bp.route("/api/users/login", methods=["POST"])
+@swag_from("docs/login.yml")
 def login():
     data = request.get_json()
     email = data.get("email")
@@ -111,6 +118,7 @@ def login():
 
 @auth_bp.route("/api/users/logout", methods=["POST"])
 @jwt_required()
+@swag_from("docs/logout.yml")
 def logout():
     jti = get_jwt()["jti"]
     revoked_token = RevokedToken(token=jti)

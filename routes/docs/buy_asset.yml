@@ -1,0 +1,47 @@
+tags:
+  - Market Operations
+summary: Buy Asset
+description: Endpoint to purchase a specified asset using the authenticated user's account balance.
+security:
+  - BearerAuth: []
+parameters:
+  - in: header
+    name: Authorization
+    required: true
+    schema:
+      type: string
+    description: JWT token in the format "Bearer <your_token>"
+    example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..
+  - in: body
+    name: body
+    required: true
+    schema:
+      type: object
+      required:
+        - pin
+        - assetSymbol
+        - amount
+      properties:
+        pin:
+          type: string
+          description: The user's 4-digit PIN for transaction authorization.
+          example: "1234"
+        assetSymbol:
+          type: string
+          description: The symbol of the asset to purchase.
+          example: "AAPL"
+        amount:
+          type: number
+          description: The amount in the user's account balance to use for the purchase.
+          example: 1000
+responses:
+  201:
+    description: Asset purchased successfully.
+  400:
+    description: Missing fields, invalid input, insufficient funds, or asset not found.
+  401:
+    description: Session expired or invalid PIN.
+  404:
+    description: Asset not found.
+  500:
+    description: Internal Server Error.

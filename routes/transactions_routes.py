@@ -4,12 +4,14 @@ from extensions import db
 
 from models import Transaction, User
 from utils import is_token_revoked
+from flasgger.utils import swag_from
 
 transactions_bp = Blueprint("transactions", __name__)
 
 
 @transactions_bp.route("/api/account/deposit", methods=["POST"])
 @jwt_required()
+@swag_from("docs/deposit.yml")
 def deposit():
     try:
         # Check if token has been revoked
@@ -82,6 +84,7 @@ def deposit():
 
 @transactions_bp.route("/api/account/withdraw", methods=["POST"])
 @jwt_required()
+@swag_from("docs/withdraw.yml")
 def withdraw():
     try:
         # Check if token has been revoked
@@ -157,6 +160,7 @@ def withdraw():
 
 @transactions_bp.route("/api/account/fund-transfer", methods=["POST"])
 @jwt_required()
+@swag_from("docs/fund_transfer.yml")
 def fund_transfer():
     try:
         # Check if token has been revoked
@@ -253,6 +257,7 @@ def fund_transfer():
 
 @transactions_bp.route("/api/account/transactions", methods=["GET"])
 @jwt_required()
+@swag_from("docs/get_transactions.yml")
 def get_transactions():
     try:
         # Check if token has been revoked

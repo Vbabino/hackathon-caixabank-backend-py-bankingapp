@@ -9,12 +9,14 @@ from utils import (
     send_investment_confirmation_email,
     send_investment_sale_confirmation_email,
 )
+from flasgger.utils import swag_from
 
 market_operations_bp = Blueprint("market_operations", __name__)
 
 
 @market_operations_bp.route("/api/account/buy-asset", methods=["POST"])
 @jwt_required()
+@swag_from("docs/buy_asset.yml")
 def buy_asset():
     try:
         # Check if token has been revoked
@@ -122,6 +124,7 @@ def buy_asset():
 
 @market_operations_bp.route("/api/account/sell-asset", methods=["POST"])
 @jwt_required()
+@swag_from("docs/sell_asset.yml")
 def sell_asset():
     try:
         # Check if token has been revoked
@@ -230,6 +233,7 @@ def sell_asset():
 
 
 @market_operations_bp.route("/market/prices", methods=["GET"])
+@swag_from("docs/market_prices.yml")
 def market_prices():
     try:
         market_prices = get_market_price()
@@ -240,6 +244,7 @@ def market_prices():
 
 
 @market_operations_bp.route("/market/prices/<symbol>", methods=["GET"])
+@swag_from("docs/market_price.yml")
 def market_price(symbol):
     try:
         market_prices = get_market_price()

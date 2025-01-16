@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+from flasgger.utils import swag_from
+
 
 from models import User
 from utils import is_token_revoked
@@ -10,6 +12,7 @@ user_bp = Blueprint("user", __name__)
 # Endpoint to retrive the logged-in user's details
 @user_bp.route("/api/dashboard/user", methods=["GET"])
 @jwt_required()
+@swag_from("docs/user_info.yml")
 def user_info():
     try:
         # Check if token has been revoked
@@ -46,6 +49,7 @@ def user_info():
 
 @user_bp.route("/api/dashboard/account", methods=["GET"])
 @jwt_required()
+@swag_from("docs/account_info.yml")
 def account_info():
     try:
         # Check if token has been revoked
