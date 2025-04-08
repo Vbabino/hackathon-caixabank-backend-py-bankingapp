@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  title: Flask API Documentation
+  title: Banking API
   description: API documentation for the Banking App
   version: "1.0"
 host: "localhost:3000"
